@@ -39,14 +39,14 @@ public class CPU {
      * @return the result of the execution
      */
     public ExecutionResult execute(ProcessImage p) {
-        int pc = p.processControlBlock.programCounter;
+        int pc = p.getProgramCounter();
         int numTimes = p.getInstructionAt(pc);
         
         for (int i = 0; i < numTimes; i++) {
             BubbleSort.onRandomData(500);
         }
         
-        if (pc == p.code.length() - 1)
+        if (pc == p.getCodeLength() - 1)
             return new ExecutionResult(pc, PCB.ProcessState.TERMINATED);
         else if (numTimes >= timeSlice)
             return new ExecutionResult(pc + 1, PCB.ProcessState.READY);
