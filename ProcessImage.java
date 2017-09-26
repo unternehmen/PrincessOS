@@ -4,7 +4,7 @@
 public class ProcessImage
 {
     /** The PCB linked to this process */
-    public PCB processControlBlock;
+    private PCB processControlBlock;
 
     /**
      * The code string of the process.
@@ -55,7 +55,7 @@ public class ProcessImage
      */
     public int getInstructionAt(int index)
     {
-        if (index < -1 || index > code.length()) {
+        if (index <= -1 || index > code.length()) {
             throw new IllegalArgumentException("index out of range");
         }
 
