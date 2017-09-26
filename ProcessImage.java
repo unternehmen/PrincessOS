@@ -24,17 +24,32 @@ public class ProcessImage
      */
     public String code;
 
+    /** The time when the process was created */
+    private long realCreationTime;
+
     /**
      * Create a new ProcessImage.
      *
-     * @param code  the code string (see {@link #code})
+     * @param code         the code string (see {@link #code})
+     * @param arrivalTime  the arrival time
+     *                       (see {@link PCB#arrivalTime})
      * @return  the new ProcessImage
      */
     public ProcessImage(int id, int priority,
                         int arrivalTime,
                         String code)
     {
+        realCreationTime = System.currentTimeMillis();
         this.processControlBlock = new PCB(id, priority, arrivalTime);
         this.code = code;
+    }
+
+    public int getInstructionAt(int index)
+    {
+        if (index < -1 || index > code.length()) {
+            throw new IllegalArgumentException("index out of range");
+        }
+
+        return (int)(code.charAt(index) - '0');
     }
 }
