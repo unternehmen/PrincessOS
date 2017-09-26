@@ -30,9 +30,12 @@ public class ProcessImage
     /**
      * Create a new ProcessImage.
      *
-     * @param code         the code string (see {@link #code})
+     * @param id           the process ID (see {@link PCB#id})
+     * @param priority     the process priority
+     *                       (see {@link PCB#priority})
      * @param arrivalTime  the arrival time
      *                       (see {@link PCB#arrivalTime})
+     * @param code         the code string (see {@link #code})
      * @return  the new ProcessImage
      */
     public ProcessImage(int id, int priority,
@@ -44,6 +47,12 @@ public class ProcessImage
         this.code = code;
     }
 
+    /**
+     * Get the instruction at the given index in the process' code.
+     *
+     * @param index  the index
+     * @return  the instruction
+     */
     public int getInstructionAt(int index)
     {
         if (index < -1 || index > code.length()) {
