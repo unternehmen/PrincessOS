@@ -18,7 +18,7 @@ public class ProcessImage {
      * @param priority  the process priority (see {@link #priority})
      * @param code      the CPU-I/O burst sequence (see {@link #code})
      * @return  the new ProcessImage
-     * @throws IllegalArgumentException  if priority, or code < 0
+     * @throws IllegalArgumentException  if priority or code < 0
      */
     public ProcessImage(int id, int priority, String code)
     {
