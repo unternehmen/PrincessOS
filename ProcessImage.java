@@ -89,7 +89,7 @@ public class ProcessImage
      */
     public int getProgramCounter()
     {
-        return processControlBlack.programCounter;
+        return processControlBlock.programCounter;
     }
 
     /**
@@ -99,7 +99,7 @@ public class ProcessImage
      */
     public void setProgramCounter(int programCounter)
     {
-        processControlBlack.programCounter = programCounter;
+        processControlBlock.programCounter = programCounter;
     }
 
     /**
