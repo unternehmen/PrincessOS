@@ -1,17 +1,19 @@
 /**
- * A Process represents a program running on the operating system.
+ * A PCB represents a program's state on the operating system.
  */
-public class Process {
+public class PCB {
     /** The ID of the process */
     public int id;
     /** The priority of the process (0 = lowest, etc.) */
     public int priority;
-    /** The CPU-I/O burst sequence */
-    public String code;
+    /** The arrival time (0 = earliest, 1 = second earliest, etc.) */
+    public int arrivalTime;
     /** The state of the process */
     public ProcessState state;
+    /** The position of the next instruction */
+    public int programCounter;
 
-    /** The possible states of a Process */
+    /** The possible states of the process */
     public enum ProcessState {
         /** The process is being created and is not yet running. */
         NEW,
@@ -27,15 +29,15 @@ public class Process {
 
 
     /**
-     * Create a new Process.
+     * Create a new PCB.
      *
-     * @param id        the process ID (see {@link #id})
-     * @param priority  the process priority (see {@link #priority})
-     * @param code      the CPU-I/O burst sequence (see {@link #code})
-     * @return  the new Process
+     * @param id           the process ID (see {@link #id})
+     * @param priority     the process priority (see {@link #priority})
+     * @param arrivalTime  the arrival time (see {@link #arrivalTime})
+     * @return  the new PCB
      * @throws IllegalArgumentException  if id or priority < 0
      */
-    public Process(int id, int priority, String code)
+    public PCB(int id, int priority, int arrivalTime)
     {
         if (id < 0)
             throw new IllegalArgumentException("id < 0");
@@ -44,7 +46,7 @@ public class Process {
 
         this.id = id;
         this.priority = priority;
-        this.code = code;
+        this.arrivalTime = arrivalTime;
         this.state = ProcessState.NEW;
     }
 }
