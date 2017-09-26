@@ -12,6 +12,14 @@ public class PCB {
     public ProcessState state;
     /** The position of the next instruction */
     public int programCounter;
+    /**
+     * The amount of work needed on the current instruction.
+     *
+     * This should be managed entirely by the OS via
+     * {@link ProcessImage#setAmountOfWorkNeeded} and
+     * {@link ProcessImage#getAmountOfWorkNeeded}.
+     */
+    public int amountOfWorkNeeded;
 
     /** The possible states of the process */
     public enum ProcessState {

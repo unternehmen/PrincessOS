@@ -123,4 +123,27 @@ public class ProcessImage
 
         processControlBlock.state = state;
     }
+
+    /**
+     * Set the amount of work needed to process the current burst.
+     *
+     * @param amountOfWork  the amount of work
+     */
+    public void setAmountOfWorkNeeded(int amount)
+    {
+        processControlBlock.amountOfWorkNeeded = amount;
+    }
+
+    /**
+     * Return the amount of work needed to process the current burst.
+     *
+     * The amount of work must have previously been set with
+     * {@link #setAmountOfWorkNeeded}.
+     *
+     * @return  the amount of work
+     */
+    public int getAmountOfWorkNeeded()
+    {
+        return processControlBlock.amountOfWorkNeeded;
+    }
 }
