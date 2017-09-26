@@ -1,7 +1,7 @@
 /**
  * A Process represents a program running on the operating system.
  */
-public class Process {
+public class Process implements Runnable {
     /** The ID of the process */
     public int id;
     /** The priority of the process (0 = lowest, etc.) */
@@ -33,7 +33,7 @@ public class Process {
      * @param priority  the process priority (see {@link #priority})
      * @param code      the CPU-I/O burst sequence (see {@link #code})
      * @return  the new Process
-     * @throws IllegalArgumentException  if priority or code < 0
+     * @throws IllegalArgumentException  if id or priority < 0
      */
     public Process(int id, int priority, String code)
     {
