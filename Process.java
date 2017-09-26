@@ -1,7 +1,7 @@
 /**
  * A Process represents a program running on the operating system.
  */
-public class Process implements Runnable {
+public class Process {
     /** The ID of the process */
     public int id;
     /** The priority of the process (0 = lowest, etc.) */
