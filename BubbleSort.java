@@ -20,12 +20,21 @@ public class BubbleSort {
             data[i] = rand.nextInt();
         }
         
-        // Bubble sort!!!
+        // Sort it!
+        sort(data);
+    }
+    
+    /**
+     * Sorts an array of integers using the bubble sort algorithm.
+     * @param data the array to sort
+     * @warning This method modifies the data in-place.
+     */
+    public static void sort(int[] data) {
         boolean goAgain = true;
         while (goAgain) {
             goAgain = false;
             
-            for (int i = 0; i <= numItems - 2; i++) {
+            for (int i = 0; i <= data.length - 2; i++) {
                 if (data[i] > data[i+1]) {
                     int temp = data[i];
                     data[i] = data[i+1];
