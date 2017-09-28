@@ -110,6 +110,8 @@ public class ProcessImage
      * You should run this whenever the state changes so that the
      * process can record latency, response time, and other statistics
      * related to its life cycle.
+     * 
+     * @param state the new state of the process
      */
     public void setState(PCB.ProcessState state)
     {
@@ -129,7 +131,7 @@ public class ProcessImage
     /**
      * Set the amount of work needed to process the current burst.
      *
-     * @param amountOfWork  the amount of work
+     * @param amount  the amount of work
      */
     public void setAmountOfWorkNeeded(int amount)
     {
@@ -147,5 +149,23 @@ public class ProcessImage
     public int getAmountOfWorkNeeded()
     {
         return processControlBlock.amountOfWorkNeeded;
+    }
+    
+    /**
+     * Sets the priority of the process.
+     * @param priority the new priority of the process
+     */
+    public void setPriority(int priority)
+    {
+        processControlBlock.priority = priority;
+    }
+    
+    /**
+     * Returns the priority of the process.
+     * @return the priority of the process
+     */
+    public int getPriority()
+    {
+        return processControlBlock.priority;
     }
 }
