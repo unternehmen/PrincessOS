@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 /**
  * This class represents an I/O device.
  * @author Charlie Murphy
@@ -27,6 +25,9 @@ public class IODevice {
         return "ready";
     }
     
+    /**
+     * @return whether the I/O device is busy or not
+     */
     public boolean isBusy() {
         return busyOrNot;
     }
