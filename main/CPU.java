@@ -14,15 +14,18 @@ public class CPU {
     public class ExecutionResult {
         public int nextPC;
         public PCB.ProcessState state;
+        public int workNeeded;
         
         /**
          * Constructs a result for an execution.
          * @param nextPC  The position of the process to resume when it is executed again.
          * @param state   The new state of the process.  Could be "wait" or "ready".
+         * @param workNeeded The amount of bubble sorts remaining on the current instruction.
          */
-        public ExecutionResult(int nextPC, PCB.ProcessState state) {
+        public ExecutionResult(int nextPC, PCB.ProcessState state, int workNeeded) {
             this.nextPC = nextPC;
             this.state = state;
+            this.workNeeded = workNeeded;
         }
     }
     
@@ -38,22 +41,32 @@ public class CPU {
     /**
      * Execute a process until either it finishes or we reach the time slice limit.
      * @param p the process to execute
+     * @param numQuanta the number of time quanta to give the process
      * @return the result of the execution
      */
-    public ExecutionResult execute(ProcessImage p) {
+    public ExecutionResult execute(ProcessImage p, int numQuanta) {
         int pc = p.getProgramCounter();
-        int numTimes = p.getInstructionAt(pc);
+        int instruction = p.getInstructionAt(pc);
+        int workProgress = p.getWorkProgress();
         
-        for (int i = 0; i < numTimes; i++) {
-            BubbleSort.onRandomData(500);
+        for (int i = 0; i < numQuanta; i++) {
+            if (workProgress < instruction) {
+                BubbleSort.onRandomData(500);
+                workProgress--;
+            } else {
+                BubbleSort.onRandomData(500);
+                pc++;
+                if (pc < p.getCodeLength()) {
+                }
+            }
         }
-        
+        /*
         if (pc == p.getCodeLength() - 1)
             return new ExecutionResult(pc, PCB.ProcessState.TERMINATED);
         else if (numTimes >= timeSlice)
             return new ExecutionResult(pc + 1, PCB.ProcessState.READY);
-        
-        return new ExecutionResult(pc + 1, PCB.ProcessState.WAITING);
+        */
+        return new ExecutionResult(pc + 1, PCB.ProcessState.WAITING, 0);
     }
     
     /**

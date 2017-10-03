@@ -129,13 +129,13 @@ public class ProcessImage
     }
 
     /**
-     * Set the amount of work needed to process the current burst.
+     * Set the amount of work completed on the current burst.
      *
      * @param amount  the amount of work
      */
-    public void setAmountOfWorkNeeded(int amount)
+    public void setWorkProgress(int amount)
     {
-        processControlBlock.amountOfWorkNeeded = amount;
+        processControlBlock.workProgress = amount;
     }
 
     /**
@@ -146,9 +146,9 @@ public class ProcessImage
      *
      * @return  the amount of work
      */
-    public int getAmountOfWorkNeeded()
+    public int getWorkProgress()
     {
-        return processControlBlock.amountOfWorkNeeded;
+        return processControlBlock.workProgress;
     }
     
     /**

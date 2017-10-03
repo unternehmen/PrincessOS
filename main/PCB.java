@@ -15,13 +15,13 @@ public class PCB {
     /** The position of the next instruction */
     public int programCounter;
     /**
-     * The amount of work needed on the current instruction.
+     * The amount of work completed on the current burst.
      *
      * This should be managed entirely by the OS via
-     * {@link ProcessImage#setAmountOfWorkNeeded} and
-     * {@link ProcessImage#getAmountOfWorkNeeded}.
+     * {@link ProcessImage#setWorkProgress} and
+     * {@link ProcessImage#getWorkProgress}.
      */
-    public int amountOfWorkNeeded;
+    public int workProgress;
 
     /** The possible states of the process */
     public enum ProcessState {
@@ -58,5 +58,6 @@ public class PCB {
         this.priority = priority;
         this.arrivalTime = arrivalTime;
         this.state = ProcessState.NEW;
+        this.workProgress = 0;
     }
 }
