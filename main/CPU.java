@@ -49,24 +49,37 @@ public class CPU {
         int instruction = p.getInstructionAt(pc);
         int workProgress = p.getWorkProgress();
         
-        for (int i = 0; i < numQuanta; i++) {
-            if (workProgress < instruction) {
-                BubbleSort.onRandomData(500);
-                workProgress--;
-            } else {
-                BubbleSort.onRandomData(500);
-                pc++;
-                if (pc < p.getCodeLength()) {
-                }
-            }
-        }
-        /*
-        if (pc == p.getCodeLength() - 1)
-            return new ExecutionResult(pc, PCB.ProcessState.TERMINATED);
-        else if (numTimes >= timeSlice)
-            return new ExecutionResult(pc + 1, PCB.ProcessState.READY);
-        */
-        return new ExecutionResult(pc + 1, PCB.ProcessState.WAITING, 0);
+		if (numQuanta == -1) {
+			// numQuanta is -1, that means we can take all the time quanta we need
+			while (workProgress < instruction) {
+				BubbleSort.onRandomData(500);
+				workProgress++;
+			}
+			
+			// We finished the instruction, so switch to I/O waiting state
+			return new ExecutionResult(pc + 1, PCB.ProcessState.WAITING, 0);
+		} else {
+			// We're only allowed to work for a certain number of time quanta
+			for (int i = 0; i < numQuanta && workProgress < instruction; i++) {
+				// Do work
+				if (workProgress < instruction) {
+					BubbleSort.onRandomData(500);
+					workProgress++;
+				}
+			}
+			
+			// Did we finish the instruction?
+			if (workProgress == instruction) {
+				// Did we finish the whole program?
+				if (pc == p.getCodeLength()) {
+					return new ExecutionResult(pc + 1, PCB.ProcessState.TERMINATED, 0);
+				} else {
+					return new ExecutionResult(pc + 1, PCB.ProcessState.WAITING, 0);
+				}
+			} else {
+				return new ExecutionResult(pc, PCB.ProcessState.READY, workProgress);
+			}
+		}
     }
     
     /**
