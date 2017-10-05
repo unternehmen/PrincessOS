@@ -57,7 +57,11 @@ public class CPU {
             }
 
             // We finished the instruction, so switch to I/O waiting state
-            return new ExecutionResult(pc + 1, PCB.ProcessState.WAITING, 0);
+            if (pc == p.getCodeLength() - 1) {
+                return new ExecutionResult(pc + 1, PCB.ProcessState.TERMINATED, 0);
+            } else {
+                return new ExecutionResult(pc + 1, PCB.ProcessState.WAITING, 0);
+            }
         } else {
             // We're only allowed to work for a certain number of time quanta
             for (int i = 0; i < numQuanta && workProgress < instruction; i++) {
@@ -71,7 +75,7 @@ public class CPU {
             // Did we finish the instruction?
             if (workProgress == instruction) {
                 // Did we finish the whole program?
-                if (pc == p.getCodeLength()) {
+                if (pc == p.getCodeLength() - 1) {
                     return new ExecutionResult(pc + 1, PCB.ProcessState.TERMINATED, 0);
                 } else {
                     return new ExecutionResult(pc + 1, PCB.ProcessState.WAITING, 0);
