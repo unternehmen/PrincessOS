@@ -168,4 +168,16 @@ public class ProcessImage
     {
         return processControlBlock.priority;
     }
+    
+    /**
+     * Return the response time and latency of this process.
+     *
+     * Only run this after the process has terminated,
+     * since these values may not exist before then.
+     *
+     * @return the pair containing the response time and latency
+     */
+    public Pair<Long, Long> getReport() {
+        return new Pair<>(responseTime, latency);
+    }
 }
