@@ -11,7 +11,7 @@ import main.ProcessImage;
  * @author Charlie Murphy
  */
 public class StaticPriority implements Scheduler {
-    private ArrayList<ProcessImage> readyQueue;
+    private final ArrayList<ProcessImage> readyQueue;
     
     public StaticPriority(ArrayList<ProcessImage> readyQueue) {
         this.readyQueue = readyQueue;
