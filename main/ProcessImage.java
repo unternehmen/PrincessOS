@@ -1,6 +1,8 @@
 package main;
 
-/**
+import common.Pair;
+
+ /**
  * A ProcessImage represents a process and its executable code.
  */
 public class ProcessImage
@@ -179,5 +181,14 @@ public class ProcessImage
      */
     public Pair<Long, Long> getReport() {
         return new Pair<>(responseTime, latency);
+    }
+    
+    /*
+    Added this to make it capable for me to get the PCB id from the process
+    image in the OS class for updating in the process table.
+    -Brody
+    */
+    public int getPCB_ID(){
+        return processControlBlock.id;
     }
 }

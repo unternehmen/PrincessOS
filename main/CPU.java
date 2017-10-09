@@ -55,6 +55,30 @@ public class CPU implements Runnable {
 	public void start() {
 		new Thread(this).start();
 	}
+        
+        /*
+        Return executionResult process state for use in OS class
+        with regard to determining proper queue placement
+        -Brody
+        */
+        public PCB.ProcessState getProcessState(){
+            return executionResult.state;
+        }
+        
+        /*
+        Return processImage ID for updating process_Table in OS
+        -Brody
+        */
+        public int getProcessID(){
+            return currentProcess.getPCB_ID();
+        }
+        
+        /*
+        Return process image for updating appropriate queues in OS
+        */
+        public ProcessImage getProcessImage(){
+            return currentProcess;
+        }
     
     /**
      * Execute a process until either it finishes or we reach the time slice limit.
