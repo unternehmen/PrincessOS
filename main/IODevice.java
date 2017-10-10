@@ -137,7 +137,7 @@ public class IODevice implements Runnable {
 	/**
 	 * @return the result of the last execution.
 	 */
-	private synchronized ExecutionResult getExecutionResult() {
+	public synchronized ExecutionResult getExecutionResult() {
 		return this.executionResult;
 	}
 	
