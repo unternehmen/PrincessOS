@@ -30,4 +30,9 @@ public class StaticPriority implements Scheduler {
         
         return heap.remove();
     }
+    
+    public boolean isEmpty(){
+        return readyQueue.isEmpty();
+    }
+    
 }

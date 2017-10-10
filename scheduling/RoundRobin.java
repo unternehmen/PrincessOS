@@ -18,11 +18,14 @@ public class RoundRobin
     
     public Pair<ProcessImage, Integer> nextProcess()
     {
-        return new Pair<>(readyQueue.get(0), quantumLength);
+        return new Pair<>(readyQueue.remove(0), quantumLength);
     }
     
     public void remove(){
         readyQueue.remove(0);
     }
     
+    public boolean isEmpty(){
+        return readyQueue.isEmpty();
+    }
 }
