@@ -1,5 +1,6 @@
 package scheduling;
 
+import common.Pair;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 import main.ProcessImage;
@@ -21,14 +22,14 @@ public class StaticPriority implements Scheduler {
      * @return the next process that deserves CPU time.
      */
     @Override
-    public ProcessImage nextProcess() {
+    public Pair<ProcessImage, Integer> nextProcess() {
         PriorityQueue<ProcessImage> heap = new PriorityQueue<ProcessImage>();
         
         for (ProcessImage p : readyQueue) {
             heap.add(p);
         }
         
-        return heap.remove();
+        return new Pair<>(heap.remove(), -1);
     }
     
     public boolean isEmpty(){

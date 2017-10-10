@@ -5,7 +5,7 @@ import common.Pair;
  /**
  * A ProcessImage represents a process and its executable code.
  */
-public class ProcessImage
+public class ProcessImage implements Comparable<ProcessImage>
 {
     /** The PCB linked to this process */
     private PCB processControlBlock;
@@ -59,6 +59,19 @@ public class ProcessImage
         this.processControlBlock = new PCB(id, priority, arrivalTime);
         this.code = code;
         hasWaited = false;
+    }
+    
+    /**
+     * Compare this process to another based on their priority.
+     * 
+     * @param other  the other ProcessImage
+     * @return  a comparison of the processes' priorities
+     */
+    @Override
+    public int compareTo(ProcessImage other)
+    {
+        return Integer.compare(processControlBlock.priority,
+                               other.processControlBlock.priority);
     }
 
     /**
