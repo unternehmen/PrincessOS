@@ -66,6 +66,7 @@ public class ProcessImage
      *
      * @param index  the index
      * @return  the instruction
+     * @throws IllegalArgumentException  if index is not within code bounds
      */
     public int getInstructionAt(int index)
     {
