@@ -122,10 +122,10 @@ public class OS{
                 }
                 
                 //Set initial pImage state in new queue to 'ready'
-                ProcessImage pImage = New_Queue.get(0);
+                ProcessImage pImage = New_Queue.remove(0);
                 pImage.setState(PCB.ProcessState.READY);
                 Ready_Queue.add(pImage);
-                process_Table.updateState(pImage.getPCB_ID(), PCB.ProcessState.READY);
+                
                 
                 
                 //Am just doing FCFS inside the OS class, don't see need
@@ -139,86 +139,69 @@ public class OS{
                     while(Terminated_Queue.size() < numPImages){
                         //Check for terminated CPU process before assigning new one
                         if(!cpu.isBusy()){
-                            //Get process and place in needed queue
-                            try{
-                                ProcessImage processImage = cpu.getProcessImage();
-                                try{
-                                    //If not index out of bounds, process is waiting
-                                    processImage.getInstructionAt(index);
-                                    processImage.setState(PCB.ProcessState.WAITING);
-                                    Wait_Queue.add(processImage);
+                            CPU.ExecutionResult result = cpu.getExecutionResult();
+                            
+                            if (result == null) {
+                                if(!Ready_Queue.isEmpty()){
+                                    ProcessImage processImage = Ready_Queue.remove(0);
+                                    cpu.execute(processImage, timeSlice);
                                 }
-                                catch (IllegalArgumentException i){
-                                    processImage.setState(PCB.ProcessState.TERMINATED);
-                                    Terminated_Queue.add(processImage);
-                                    index = 0;
-                                    
-                                    //Set next process image in new queue to 'ready'
-                                    //after current process image has terminated
-                                    if(newQueueIndex < New_Queue.size()){
-                                        ProcessImage p_Image = New_Queue.get(newQueueIndex);
+                            } else {
+                                //Check state of process currently used by CPU
+                                if(result.state == PCB.ProcessState.WAITING){
+                                    result.process.setState(PCB.ProcessState.WAITING);
+                                    result.process.setProgramCounter(result.nextPC);
+                                    Wait_Queue.add(result.process);
+                                }
+                                else if(result.state == PCB.ProcessState.TERMINATED){
+                                    result.process.setState(PCB.ProcessState.TERMINATED);
+                                    result.process.setProgramCounter(result.nextPC);
+                                    Terminated_Queue.add(result.process);
+                                    if(!New_Queue.isEmpty()){
+                                        ProcessImage p_Image = New_Queue.remove(0);
                                         p_Image.setState(PCB.ProcessState.READY);
                                         Ready_Queue.add(p_Image);
-                                        newQueueIndex++;
                                     }
                                 }
-                            }
-                            catch (NullPointerException n){
-                                
-                            }
-                            if(!Ready_Queue.isEmpty()){
-                                //Add new process to CPU and run
-                                System.out.println("Ready queue size: " + Ready_Queue.size());
-                                ProcessImage processImage = Ready_Queue.remove(0);
-                                processImage.setState(PCB.ProcessState.RUNNING);
-                                cpu.execute(processImage, timeSlice);
-                                index++;
-                                System.out.println("PCB ID: " + processImage.getPCB_ID() + "\nIndex: " + index);
-                                System.out.println("CPU is busy");
+                                else if(result.state == PCB.ProcessState.READY){
+                                    result.process.setState(PCB.ProcessState.READY);
+                                    result.process.setProgramCounter(result.nextPC);
+                                    Ready_Queue.add(result.process);
+                                }
                             }
                         }
                         
                         //Check for terminated IO process before assigning new one
                         if(!io.isBusy()){
-                            //Get process and place in needed queue
-                            try{
-                                ProcessImage processImage = io.getProcessImage();
-                                
-                                try{
-                                    //If not index out of bounds, process is waiting
-                                    processImage.getInstructionAt(index);
-                                    processImage.setState(PCB.ProcessState.READY);
-                                    Ready_Queue.add(processImage);
-                                    
+                            IODevice.ExecutionResult result = io.getExecutionResult();
+                            
+                            if (result == null) {
+                                if(!Wait_Queue.isEmpty()){
+                                    ProcessImage processImage = Wait_Queue.remove(0);
+                                    io.execute(processImage, timeSlice);
                                 }
-                                catch (IllegalArgumentException i){
-                                    processImage.setState(PCB.ProcessState.TERMINATED);
-                                    Terminated_Queue.add(processImage);
-                                    index = 0;
-                                    
-                                    //Set next process image in new queue to 'ready'
-                                    //after current process image has terminated
-                                    if(newQueueIndex < New_Queue.size()){
-                                        ProcessImage p_Image = New_Queue.get(newQueueIndex);
+                            } else {
+                                //Check state of process currently used by IO
+                                if(result.state == PCB.ProcessState.WAITING){
+                                    result.process.setState(PCB.ProcessState.WAITING);
+                                    result.process.setProgramCounter(result.nextPC);
+                                    Wait_Queue.add(result.process);
+                                }
+                                else if(result.state == PCB.ProcessState.TERMINATED){
+                                    result.process.setState(PCB.ProcessState.TERMINATED);
+                                    result.process.setProgramCounter(result.nextPC);
+                                    Terminated_Queue.add(result.process);
+                                    if(!New_Queue.isEmpty()){
+                                        ProcessImage p_Image = New_Queue.remove(0);
                                         p_Image.setState(PCB.ProcessState.READY);
                                         Ready_Queue.add(p_Image);
-                                        newQueueIndex++;
                                     }
                                 }
-                            }
-                            catch (NullPointerException n){
-                                
-                            }
-                            
-                            if(!Wait_Queue.isEmpty()){
-                                System.out.println("Wait queue size: " + Wait_Queue.size());
-                                ProcessImage processImage = Wait_Queue.remove(0);
-                                processImage.setState(PCB.ProcessState.RUNNING);
-                                io.execute(processImage, timeSlice);
-                                index++;
-                                System.out.println("PCB ID: " + processImage.getPCB_ID() + "\nIndex: " + index);
-                                System.out.println("IO is busy");
-                                
+                                else if(result.state == PCB.ProcessState.READY){
+                                    result.process.setState(PCB.ProcessState.READY);
+                                    result.process.setProgramCounter(result.nextPC);
+                                    Ready_Queue.add(result.process);
+                                }
                             }
                         }
                     }
@@ -236,6 +219,11 @@ public class OS{
                     while(Terminated_Queue.size() < numPImages){
                         
                     }
+                    
+                    /*
+                    Preemption, get work needed set work progress
+                    */
+                    
                 }
                 else if(choice == 3){
                     System.out.println("Static Priority");
@@ -348,11 +336,13 @@ public class OS{
                     Reporter myReporter = new Reporter();
                     Pair pair;
                     for(ProcessImage p : Terminated_Queue){
+                        System.out.println("Process ID: " + p.getPCB_ID());
                         pair = p.getReport();
                         //Get report, cast variables to longs
                         responseList.add((long)pair.getHead());
                         latencyList.add((long)pair.getTail());
                     }
+                    
                     
                     System.out.println("\n***Response Report***");
                     myReporter.handleAll(responseList);
