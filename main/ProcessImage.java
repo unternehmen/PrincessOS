@@ -69,7 +69,7 @@ public class ProcessImage
      */
     public int getInstructionAt(int index)
     {
-        if (index <= -1 || index > code.length()) {
+        if (index <= -1 || index >= code.length()) {
             throw new IllegalArgumentException("index out of range");
         }
 

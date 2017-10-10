@@ -44,7 +44,7 @@ public class Reporter {
 	stdDev = Math.sqrt(stdDev);
         
         System.out.println("Mean: " + mean + "\nMin: " + min 
-                + "\nMax: " + max + "\nStandard Deviation: " + stdDev);
+                + "\nMax: " + max + "\nStandard Deviation: " + stdDev + "\n");
         
     }
 }

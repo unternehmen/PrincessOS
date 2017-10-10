@@ -30,7 +30,7 @@ public class OS{
         can't remember what we all agreed on before :'(
         */
         
-        final int timeSlice = 4;
+        final int timeSlice = 9;
         CPU cpu = new CPU(timeSlice);
         IODevice io = new IODevice(timeSlice);
         
@@ -84,7 +84,7 @@ public class OS{
 
             Scanner myFileReader = new Scanner(myFile);
             while (myFileReader.hasNextLine()) {
-                fileStrings = myFileReader.nextLine().split(" ");
+                fileStrings = myFileReader.nextLine().split(", ");
                 processID = Integer.parseInt(fileStrings[0]);
                 processArrivalOrder = Integer.parseInt(fileStrings[1]);
                 processPriority = Integer.parseInt(fileStrings[2]);
@@ -92,7 +92,6 @@ public class OS{
                 ProcessImage pImage = new ProcessImage(processID, processPriority, 
                                     processArrivalOrder, processCode);
                 New_Queue.add(pImage);
-                Ready_Queue.add(pImage);
                 numPImages++;
             }
 
@@ -107,92 +106,254 @@ public class OS{
             Scanner myScanner = new Scanner(System.in);
             boolean done = false;
             
-            /*
-            Am adding this becasue queue.remove() is a lot easier 
-            than managing index values, and temp will hold initial ready 
-            queue values
-            */
-            ArrayList<ProcessImage> Temp_Ready_Queue = Ready_Queue;
             while(!done){
                 System.out.println("***Choose one***\n1: First Come First Serve"
-                        + "\n2: Round Robin\n3: Static Priority\n4: Exit\n>");
+                        + "\n2: Round Robin\n3: Static Priority\n4: Exit");
+                System.out.print(">");
                 //Catch incorrect input and exit program
                 try{
                     choice = Integer.parseInt(myScanner.nextLine());
+                    System.out.println();
                 }
                 catch(Exception e){
-                    System.out.println("Incorrect input, exiting program...");
+                    System.out.println("\nIncorrect input, exiting program...");
                     choice = 4;
                 }
                 
-                //If we've removed all from ready, repopulate it
-                if(Ready_Queue.isEmpty()){
-                    Ready_Queue = Temp_Ready_Queue;
-                }    
+                //Set initial pImage state in new queue to 'ready'
+                ProcessImage pImage = New_Queue.get(0);
+                pImage.setState(PCB.ProcessState.READY);
+                Ready_Queue.add(pImage);
+                process_Table.updateState(pImage.getPCB_ID(), PCB.ProcessState.READY);
                 
-                //Set pImage states in ready queue to 'ready'
-                for(ProcessImage pImage : Ready_Queue){
-                    pImage.setState(PCB.ProcessState.READY);
-                    process_Table.updateState(pImage.getPCB_ID(), PCB.ProcessState.READY);
-                }
                 
                 //Am just doing FCFS inside the OS class, don't see need
                 //for extra class for this alone
                 if(choice == 1){
                     System.out.println("First Come First Serve");
                     
-                    //FIXME cpu.start();
-                    //FIXME io.start();
-                    //FIXME Have no idea what I am doing here
+                    //Index used for noting code position for PCB
+                    int index = 0;
+                    int newQueueIndex = 1;
                     while(Terminated_Queue.size() < numPImages){
                         //Check for terminated CPU process before assigning new one
                         if(!cpu.isBusy()){
-                            //Get finished process and place in terminated queue
-                            if(cpu.getProcessState() == PCB.ProcessState.TERMINATED){
-                                process_Table.updateState(cpu.getProcessID(), PCB.ProcessState.TERMINATED);
-                                Terminated_Queue.add(cpu.getProcessImage());
+                            //Get process and place in needed queue
+                            try{
+                                ProcessImage processImage = cpu.getProcessImage();
+                                process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.WAITING);
+                                try{
+                                    //If not index out of bounds, process is waiting
+                                    processImage.getInstructionAt(index);
+                                    Wait_Queue.add(processImage);
+                                    
+                                }
+                                catch (IllegalArgumentException i){
+                                    process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.TERMINATED);
+                                    Terminated_Queue.add(processImage);
+                                    index = 0;
+                                    
+                                    //Set next process image in new queue to 'ready'
+                                    //after current process image has terminated
+                                    if(newQueueIndex < New_Queue.size()){
+                                        ProcessImage p_Image = New_Queue.get(newQueueIndex);
+                                        p_Image.setState(PCB.ProcessState.READY);
+                                        Ready_Queue.add(p_Image);
+                                        process_Table.updateState(p_Image.getPCB_ID(), PCB.ProcessState.READY);
+
+                                        newQueueIndex++;
+                                    }
+                                }
                             }
-                            if(Ready_Queue.size() > 0){
+                            catch (NullPointerException n){
+                                
+                            }
+                            if(!Ready_Queue.isEmpty()){
                                 //Add new process to CPU and run
+                                System.out.println("Ready queue size: " + Ready_Queue.size());
                                 ProcessImage processImage = Ready_Queue.remove(0);
                                 processImage.setState(PCB.ProcessState.RUNNING);
                                 process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.RUNNING);
-                                cpu.execute(processImage, numPImages);
-                                cpu.run();
+                                
+                                
+                                /*
+                                FIXME I need the next commented line back in some fashion to pass 
+                                the processimage to the CPU and IO Device
+                                */
+                                //cpu.execute(processImage, processImage.getInstructionAt(index));
+                                index++;
+                                System.out.println("PCB ID: " + processImage.getPCB_ID() + "\nIndex: " + index);
+                                System.out.println("CPU is busy");
+                                cpu.start();
                             }
                         }
                         
                         //Check for terminated IO process before assigning new one
                         if(!io.isBusy()){
-                            //Get process and place in terminated queue
-                            if(io.getProcessState() == PCB.ProcessState.WAITING){
-                                process_Table.updateState(io.getProcessID(), PCB.ProcessState.READY);
-                                Ready_Queue.add(io.getProcessImage());
+                            //Get process and place in needed queue
+                            try{
+                                ProcessImage processImage = io.getProcessImage();
+                                process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.READY);
+                                try{
+                                    //If not index out of bounds, process is waiting
+                                    processImage.getInstructionAt(index);
+                                    Ready_Queue.add(processImage);
+                                    
+                                }
+                                catch (IllegalArgumentException i){
+                                    process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.TERMINATED);
+                                    Terminated_Queue.add(processImage);
+                                    index = 0;
+                                    
+                                    //Set next process image in new queue to 'ready'
+                                    //after current process image has terminated
+                                    if(newQueueIndex < New_Queue.size()){
+                                        ProcessImage p_Image = New_Queue.get(newQueueIndex);
+                                        p_Image.setState(PCB.ProcessState.READY);
+                                        Ready_Queue.add(p_Image);
+                                        process_Table.updateState(p_Image.getPCB_ID(), PCB.ProcessState.READY);
+
+                                        newQueueIndex++;
+                                    }
+                                }
                             }
-                            if(Wait_Queue.size() > 0){
-                                ProcessImage processImage = Wait_Queue.remove(0);
+                            catch (NullPointerException n){
                                 
+                            }
+                            
+                            if(!Wait_Queue.isEmpty()){
+                                System.out.println("Wait queue size: " + Wait_Queue.size());
+                                ProcessImage processImage = Wait_Queue.remove(0);
                                 processImage.setState(PCB.ProcessState.RUNNING);
                                 process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.RUNNING);
-                                io.execute(processImage, numPImages);
-                                io.run();
+                                
+                                
+                                /*
+                                FIXME I need the next commented line back in some fashion to pass 
+                                the processimage to the CPU and IO Device
+                                */
+                                //io.execute(processImage, processImage.getInstructionAt(index));
+                                index++;
+                                System.out.println("PCB ID: " + processImage.getPCB_ID() + "\nIndex: " + index);
+                                System.out.println("IO is busy");
+                                io.start();
                             }
                         }
                     }
-                    //FIXME cpu.end();
-                    //FIXME io.end();
                 }
                 //God help me understand how to use the RR and Static Priority classes
                 else if(choice == 2){
                     System.out.println("Round Robin");
+                    for(ProcessImage p : New_Queue){
+                        p.setState(PCB.ProcessState.READY);
+                        Ready_Queue.add(p);
+                        process_Table.updateState(pImage.getPCB_ID(), PCB.ProcessState.READY);
+                    }
+                    RoundRobin roundRobin = new RoundRobin(Ready_Queue, 9);
+                    
                     while(Terminated_Queue.size() < numPImages){
                         
                     }
                 }
                 else if(choice == 3){
                     System.out.println("Static Priority");
+                    int index = 0;
+                    for(ProcessImage p : New_Queue){
+                        p.setState(PCB.ProcessState.READY);
+                        Ready_Queue.add(p);
+                        process_Table.updateState(pImage.getPCB_ID(), PCB.ProcessState.READY);
+                    }
+                    StaticPriority staticPriority = new StaticPriority(Ready_Queue);
+                    
                     while(Terminated_Queue.size() < numPImages){
+                        if(!cpu.isBusy()){
+                            try{
+                                ProcessImage processImage = cpu.getProcessImage();
+                                process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.WAITING);
+
+                                //see if the process being pulled off is terminated
+                                try{
+                                    processImage.getInstructionAt(index);
+                                    Wait_Queue.add(processImage);
+                                }
+                                catch (IllegalArgumentException i){
+                                    process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.TERMINATED);
+                                    Terminated_Queue.add(processImage);
+                                    index = 0;
+                                    
+                                    //Get next process and put in ready queue
+                                    ProcessImage p_Image = staticPriority.nextProcess();
+                                    Ready_Queue.add(p_Image);
+                                    process_Table.updateState(p_Image.getPCB_ID(), PCB.ProcessState.READY);
+                                }
+                            }
+                            catch (NullPointerException n){
+                                
+                            }
+
+                            if(!Ready_Queue.isEmpty()) {
+                                System.out.println("Ready queue size: " + Ready_Queue.size());
+                                ProcessImage processImage = Ready_Queue.remove(0);
+                                processImage.setState(PCB.ProcessState.RUNNING);
+                                process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.RUNNING);
+                                
+                                
+                                /*
+                                FIXME I need the next commented line back in some fashion to pass 
+                                the processimage to the CPU and IO Device
+                                */
+                                //cpu.execute(processImage, processImage.getInstructionAt(index));
+                                index++;
+                                System.out.println("PCB ID: " + processImage.getPCB_ID() + "\nIndex: " + index);
+                                System.out.println("CPU is busy");
+                                cpu.start();
+                            }
+                        }
                         
+                        if(!io.isBusy()){
+                            try{
+                                ProcessImage processImage = io.getProcessImage();
+                                process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.READY);
+                                try{
+                                    //If not index out of bounds, process is waiting
+                                    processImage.getInstructionAt(index);
+                                    Ready_Queue.add(processImage);
+                                    
+                                }
+                                catch (IllegalArgumentException i){
+                                    process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.TERMINATED);
+                                    Terminated_Queue.add(processImage);
+                                    index = 0;
+                                    
+                                    //Get next process and put in ready queue
+                                    ProcessImage p_Image = staticPriority.nextProcess();
+                                    Ready_Queue.add(p_Image);
+                                    process_Table.updateState(p_Image.getPCB_ID(), PCB.ProcessState.READY);
+                                }
+                            }
+                            catch (NullPointerException n){
+                                
+                            }
+                            
+                            if(!Wait_Queue.isEmpty()){
+                                System.out.println("Wait queue size: " + Wait_Queue.size());
+                                ProcessImage processImage = Wait_Queue.remove(0);
+                                processImage.setState(PCB.ProcessState.RUNNING);
+                                process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.RUNNING);
+                                
+                                
+                                /*
+                                FIXME I need the next commented line back in some fashion to pass 
+                                the processimage to the CPU and IO Device
+                                */
+                                //io.execute(processImage, processImage.getInstructionAt(index));
+                                index++;
+                                System.out.println("PCB ID: " + processImage.getPCB_ID() + "\nIndex: " + index);
+                                System.out.println("IO is busy");
+                                io.start();
+                            }
+                            
+                        }
                     }
                 }
                 else

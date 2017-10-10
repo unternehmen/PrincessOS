@@ -20,4 +20,9 @@ public class RoundRobin
     {
         return new Pair<>(readyQueue.get(0), quantumLength);
     }
+    
+    public void remove(){
+        readyQueue.remove(0);
+    }
+    
 }

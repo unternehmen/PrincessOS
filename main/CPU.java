@@ -86,7 +86,7 @@ public class CPU implements Runnable {
      * @param numQuanta the number of time quanta to give the process
      * @return the result of the execution
      */
-    public synchronized boolean execute(ProcessImage p, int numQuanta) {
+    private synchronized boolean execute(ProcessImage p, int numQuanta) {
 		if (!isBusy()) {
 			this.currentProcess = p;
 			this.numQuanta = numQuanta;
@@ -162,7 +162,7 @@ public class CPU implements Runnable {
 					}
 
 					// We finished the instruction, so switch to I/O waiting state
-					if (pc == p.getCodeLength() - 1) {
+					if (pc == currentProcess.getCodeLength() - 1) {
 						setExecutionResult(new ExecutionResult(pc + 1, PCB.ProcessState.TERMINATED, 0));
 					} else {
 						setExecutionResult(new ExecutionResult(pc + 1, PCB.ProcessState.WAITING, 0));
@@ -180,7 +180,7 @@ public class CPU implements Runnable {
 					// Did we finish the instruction?
 					if (workProgress == instruction) {
 						// Did we finish the whole program?
-						if (pc == p.getCodeLength() - 1) {
+						if (pc == currentProcess.getCodeLength() - 1) {
 							setExecutionResult(new ExecutionResult(pc + 1, PCB.ProcessState.TERMINATED, 0));
 						} else {
 							setExecutionResult(new ExecutionResult(pc + 1, PCB.ProcessState.WAITING, 0));
