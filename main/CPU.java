@@ -13,6 +13,7 @@ public class CPU implements Runnable {
      */
     public class ExecutionResult {
 
+        public ProcessImage process;
         public int nextPC;
         public PCB.ProcessState state;
         public int workNeeded;
@@ -27,7 +28,8 @@ public class CPU implements Runnable {
          * @param workNeeded The amount of bubble sorts remaining on the current
          * instruction.
          */
-        public ExecutionResult(int nextPC, PCB.ProcessState state, int workNeeded) {
+        public ExecutionResult(ProcessImage process, int nextPC, PCB.ProcessState state, int workNeeded) {
+            this.process = process;
             this.nextPC = nextPC;
             this.state = state;
             this.workNeeded = workNeeded;
@@ -155,7 +157,7 @@ public class CPU implements Runnable {
         // Should we stop?
         while (!getShouldEnd()) {
             // Has the OS given us a process?
-            if (currentProcess != null) {
+            if (isBusy()) {
                 // Yes, we have been given a process.
                 // So let's execute it
                 int pc = currentProcess.getProgramCounter();
@@ -171,9 +173,9 @@ public class CPU implements Runnable {
 
                     // We finished the instruction, so switch to I/O waiting state
                     if (pc == currentProcess.getCodeLength() - 1) {
-                        setExecutionResult(new ExecutionResult(pc + 1, PCB.ProcessState.TERMINATED, 0));
+                        setExecutionResult(new ExecutionResult(currentProcess, pc + 1, PCB.ProcessState.TERMINATED, 0));
                     } else {
-                        setExecutionResult(new ExecutionResult(pc + 1, PCB.ProcessState.WAITING, 0));
+                        setExecutionResult(new ExecutionResult(currentProcess, pc + 1, PCB.ProcessState.WAITING, 0));
                     }
                 } else {
                     // We're only allowed to work for a certain number of time quanta
@@ -189,12 +191,12 @@ public class CPU implements Runnable {
                     if (workProgress == instruction) {
                         // Did we finish the whole program?
                         if (pc == currentProcess.getCodeLength() - 1) {
-                            setExecutionResult(new ExecutionResult(pc + 1, PCB.ProcessState.TERMINATED, 0));
+                            setExecutionResult(new ExecutionResult(currentProcess, pc + 1, PCB.ProcessState.TERMINATED, 0));
                         } else {
-                            setExecutionResult(new ExecutionResult(pc + 1, PCB.ProcessState.WAITING, 0));
+                            setExecutionResult(new ExecutionResult(currentProcess, pc + 1, PCB.ProcessState.WAITING, 0));
                         }
                     } else {
-                        setExecutionResult(new ExecutionResult(pc, PCB.ProcessState.READY, workProgress));
+                        setExecutionResult(new ExecutionResult(currentProcess, pc, PCB.ProcessState.READY, workProgress));
                     }
                 }
 
