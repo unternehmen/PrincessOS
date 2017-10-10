@@ -19,6 +19,7 @@ public class IODevice implements Runnable {
         public int nextPC;
         public PCB.ProcessState state;
         public int workNeeded;
+        public boolean flagged;
 
         /**
          * Constructs a result for an execution.
@@ -35,7 +36,13 @@ public class IODevice implements Runnable {
             this.nextPC = nextPC;
             this.state = state;
             this.workNeeded = workNeeded;
+            this.flagged = false;
         }
+        
+        public void setFlagged(){
+            this.flagged = true;
+        }
+        
     }
 
     private boolean busyOrNot;
@@ -90,6 +97,15 @@ public class IODevice implements Runnable {
     public ProcessImage getProcessImage() {
         return currentProcess;
     }
+    
+    public boolean hasProcess(){
+        if(currentProcess == null){
+            return false;
+        }
+        else
+            return true;
+    }
+    
 
     /**
      * Execute a process until either it finishes or we reach the time slice
@@ -205,7 +221,7 @@ public class IODevice implements Runnable {
                         setExecutionResult(new ExecutionResult(currentProcess, pc, PCB.ProcessState.WAITING, workProgress));
                     }
                 }
-
+                currentProcess = null;
                 setBusy(false);
             }
         }

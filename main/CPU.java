@@ -17,6 +17,7 @@ public class CPU implements Runnable {
         public int nextPC;
         public PCB.ProcessState state;
         public int workNeeded;
+        public boolean flagged;
 
         /**
          * Constructs a result for an execution.
@@ -33,7 +34,13 @@ public class CPU implements Runnable {
             this.nextPC = nextPC;
             this.state = state;
             this.workNeeded = workNeeded;
+            this.flagged = false;
         }
+
+        public void setFlagged() {
+            this.flagged = true;
+        }
+
     }
 
     private boolean busyOrNot;
@@ -199,7 +206,7 @@ public class CPU implements Runnable {
                         setExecutionResult(new ExecutionResult(currentProcess, pc, PCB.ProcessState.READY, workProgress));
                     }
                 }
-
+                currentProcess = null;
                 setBusy(false);
             }
         }
