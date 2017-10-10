@@ -88,7 +88,7 @@ public class IODevice implements Runnable {
      * @param numQuanta the number of time quanta to give the process
      * @return the result of the execution
      */
-    private synchronized boolean execute(ProcessImage p, int numQuanta) {
+    public synchronized boolean execute(ProcessImage p, int numQuanta) {
 		if (!isBusy()) {
 			this.currentProcess = p;
 			this.numQuanta = numQuanta;

@@ -32,8 +32,9 @@ public class OS{
         
         final int timeSlice = 9;
         CPU cpu = new CPU(timeSlice);
+        cpu.start();
         IODevice io = new IODevice(timeSlice);
-        
+        io.start();
         //Keep track of number of processe images
         int numPImages = 0;
         
@@ -141,15 +142,14 @@ public class OS{
                             //Get process and place in needed queue
                             try{
                                 ProcessImage processImage = cpu.getProcessImage();
-                                process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.WAITING);
                                 try{
                                     //If not index out of bounds, process is waiting
                                     processImage.getInstructionAt(index);
+                                    processImage.setState(PCB.ProcessState.WAITING);
                                     Wait_Queue.add(processImage);
-                                    
                                 }
                                 catch (IllegalArgumentException i){
-                                    process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.TERMINATED);
+                                    processImage.setState(PCB.ProcessState.TERMINATED);
                                     Terminated_Queue.add(processImage);
                                     index = 0;
                                     
@@ -159,8 +159,6 @@ public class OS{
                                         ProcessImage p_Image = New_Queue.get(newQueueIndex);
                                         p_Image.setState(PCB.ProcessState.READY);
                                         Ready_Queue.add(p_Image);
-                                        process_Table.updateState(p_Image.getPCB_ID(), PCB.ProcessState.READY);
-
                                         newQueueIndex++;
                                     }
                                 }
@@ -173,18 +171,10 @@ public class OS{
                                 System.out.println("Ready queue size: " + Ready_Queue.size());
                                 ProcessImage processImage = Ready_Queue.remove(0);
                                 processImage.setState(PCB.ProcessState.RUNNING);
-                                process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.RUNNING);
-                                
-                                
-                                /*
-                                FIXME I need the next commented line back in some fashion to pass 
-                                the processimage to the CPU and IO Device
-                                */
-                                //cpu.execute(processImage, processImage.getInstructionAt(index));
+                                cpu.execute(processImage, timeSlice);
                                 index++;
                                 System.out.println("PCB ID: " + processImage.getPCB_ID() + "\nIndex: " + index);
                                 System.out.println("CPU is busy");
-                                cpu.start();
                             }
                         }
                         
@@ -193,15 +183,16 @@ public class OS{
                             //Get process and place in needed queue
                             try{
                                 ProcessImage processImage = io.getProcessImage();
-                                process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.READY);
+                                
                                 try{
                                     //If not index out of bounds, process is waiting
                                     processImage.getInstructionAt(index);
+                                    processImage.setState(PCB.ProcessState.READY);
                                     Ready_Queue.add(processImage);
                                     
                                 }
                                 catch (IllegalArgumentException i){
-                                    process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.TERMINATED);
+                                    processImage.setState(PCB.ProcessState.TERMINATED);
                                     Terminated_Queue.add(processImage);
                                     index = 0;
                                     
@@ -211,8 +202,6 @@ public class OS{
                                         ProcessImage p_Image = New_Queue.get(newQueueIndex);
                                         p_Image.setState(PCB.ProcessState.READY);
                                         Ready_Queue.add(p_Image);
-                                        process_Table.updateState(p_Image.getPCB_ID(), PCB.ProcessState.READY);
-
                                         newQueueIndex++;
                                     }
                                 }
@@ -225,18 +214,11 @@ public class OS{
                                 System.out.println("Wait queue size: " + Wait_Queue.size());
                                 ProcessImage processImage = Wait_Queue.remove(0);
                                 processImage.setState(PCB.ProcessState.RUNNING);
-                                process_Table.updateState(processImage.getPCB_ID(), PCB.ProcessState.RUNNING);
-                                
-                                
-                                /*
-                                FIXME I need the next commented line back in some fashion to pass 
-                                the processimage to the CPU and IO Device
-                                */
-                                //io.execute(processImage, processImage.getInstructionAt(index));
+                                io.execute(processImage, timeSlice);
                                 index++;
                                 System.out.println("PCB ID: " + processImage.getPCB_ID() + "\nIndex: " + index);
                                 System.out.println("IO is busy");
-                                io.start();
+                                
                             }
                         }
                     }
@@ -306,7 +288,7 @@ public class OS{
                                 index++;
                                 System.out.println("PCB ID: " + processImage.getPCB_ID() + "\nIndex: " + index);
                                 System.out.println("CPU is busy");
-                                cpu.start();
+                               
                             }
                         }
                         
@@ -350,7 +332,7 @@ public class OS{
                                 index++;
                                 System.out.println("PCB ID: " + processImage.getPCB_ID() + "\nIndex: " + index);
                                 System.out.println("IO is busy");
-                                io.start();
+                                
                             }
                             
                         }
@@ -386,5 +368,7 @@ public class OS{
             myScanner.close();
         }
         System.out.println("Have a nice day :)");   
+        cpu.end();
+        io.end();
     }
 }
