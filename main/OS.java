@@ -134,7 +134,6 @@ public class OS {
                 if(New_Queue.isEmpty()){
                     New_Queue = (ArrayList<ProcessImage>)temp_New_Queue.clone();
                 }
-
                 
                 if (choice == 1) {
                     System.out.println("First Come First Serve");
@@ -334,11 +333,12 @@ public class OS {
                     System.out.println("Static Priority");
                     
                     //Populate Static priority queue
+                    ArrayList<ProcessImage> temp_Ready_Queue = new ArrayList<>();
                     for (ProcessImage p : New_Queue) {
                         p.setState(PCB.ProcessState.READY);
-                        Ready_Queue.add(p);
+                        temp_Ready_Queue.add(p);
                     }
-                    StaticPriority staticPriority = new StaticPriority(Ready_Queue);
+                    StaticPriority staticPriority = new StaticPriority(temp_Ready_Queue);
 
                     while (Terminated_Queue.size() < numPImages) {
                         if (!cpu.isBusy()) {
@@ -450,8 +450,7 @@ public class OS {
                     myReporter.handleAll(latencyList);
 
                 }
-                //Clear terminated queue for next execution
-                Terminated_Queue.clear();
+                done = true;
             }
             //Closing scanner because of Eclipse
             myScanner.close();
