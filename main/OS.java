@@ -251,7 +251,7 @@ public class OS {
                         if (!cpu.isBusy()) {
                             CPU.ExecutionResult result = cpu.getExecutionResult();
                             if (result == null) {
-                                if (!Ready_Queue.isEmpty()) {
+                                if (!roundRobin.isEmpty()) {
                                     Pair p = roundRobin.nextProcess();
                                     cpu.execute((ProcessImage)p.getHead(), (int)p.getTail());
                                 }
