@@ -347,7 +347,8 @@ public class OS {
                             CPU.ExecutionResult result = cpu.getExecutionResult();
                             if (result == null) {
                                 if (!staticPriority.isEmpty()) {
-                                    ProcessImage processImage = staticPriority.nextProcess();
+                                    Pair<ProcessImage, Integer> pair = staticPriority.nextProcess();
+                                    ProcessImage processImage = pair.getHead();
                                     cpu.execute(processImage, timeSlice);
                                 }
                             } 
@@ -375,7 +376,8 @@ public class OS {
                             }
                             else{
                                 if (!staticPriority.isEmpty()) {
-                                    ProcessImage processImage = staticPriority.nextProcess();
+                                    Pair<ProcessImage, Integer> pair = staticPriority.nextProcess();
+                                    ProcessImage processImage = pair.getHead();
                                     cpu.execute(processImage, timeSlice);
                                 }
                                 else if(!Ready_Queue.isEmpty()){
