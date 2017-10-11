@@ -186,7 +186,7 @@ public class IODevice implements Runnable {
                 if (numQuanta == -1) {
                     // numQuanta is -1, that means we can take all the time quanta we need
                     while (workProgress < instruction) {
-                        BubbleSort.onRandomData(500);
+                        BubbleSort.onRandomData(1000);
                         workProgress++;
                     }
 
@@ -202,7 +202,7 @@ public class IODevice implements Runnable {
                     for (int i = 0; i < numQuanta && workProgress < instruction; i++) {
                         // Do work
                         if (workProgress < instruction) {
-                            BubbleSort.onRandomData(500);
+                            BubbleSort.onRandomData(1000);
                             workProgress++;
                         }
                     }
