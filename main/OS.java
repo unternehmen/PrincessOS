@@ -143,6 +143,8 @@ public class OS {
                     pImage.setState(PCB.ProcessState.READY);
                     Ready_Queue.add(pImage);
                     
+                    int timeSlice_FCFS = -1;
+                    
                     while (Terminated_Queue.size() < numPImages) {
                         //Check for terminated CPU process before assigning new one
                         
@@ -158,16 +160,18 @@ public class OS {
                             if (result == null) {
                                 if (!Ready_Queue.isEmpty()) {
                                     ProcessImage processImage = Ready_Queue.remove(0);
-                                    cpu.execute(processImage, timeSlice);
+                                    cpu.execute(processImage, timeSlice_FCFS);
                                 }
                             } 
                             else if(!result.flagged){
                                 if (result.state == PCB.ProcessState.WAITING) {
                                     result.process.setState(PCB.ProcessState.WAITING);
+                                    result.process.setWorkProgress(result.workNeeded);
                                     result.process.setProgramCounter(result.nextPC);
                                     Wait_Queue.add(result.process);
                                 } else if (result.state == PCB.ProcessState.TERMINATED) {
                                     result.process.setState(PCB.ProcessState.TERMINATED);
+                                    result.process.setWorkProgress(result.workNeeded);
                                     result.process.setProgramCounter(result.nextPC);
                                     Terminated_Queue.add(result.process);
                                     if (!New_Queue.isEmpty()) {
@@ -186,7 +190,7 @@ public class OS {
                             else{
                                 if (!Ready_Queue.isEmpty()) {
                                     ProcessImage processImage = Ready_Queue.remove(0);
-                                    cpu.execute(processImage, timeSlice);
+                                    cpu.execute(processImage, timeSlice_FCFS);
                                 }
                             }
                                 
@@ -198,7 +202,7 @@ public class OS {
                             if (result == null) {
                                 if (!Wait_Queue.isEmpty()) {
                                     ProcessImage processImage = Wait_Queue.remove(0);
-                                    io.execute(processImage, timeSlice);
+                                    io.execute(processImage, timeSlice_FCFS);
                                 }
                             }
                             else if(!result.flagged) //Check state of process currently used by IO
@@ -211,6 +215,7 @@ public class OS {
                                     Wait_Queue.add(result.process);
                                 } else if (result.state == PCB.ProcessState.TERMINATED) {
                                     result.process.setState(PCB.ProcessState.TERMINATED);
+                                    result.process.setWorkProgress(result.workNeeded);
                                     result.process.setProgramCounter(result.nextPC);
                                     Terminated_Queue.add(result.process);
                                     if (!New_Queue.isEmpty()) {
@@ -220,6 +225,7 @@ public class OS {
                                     }
                                 } else if (result.state == PCB.ProcessState.READY) {
                                     result.process.setState(PCB.ProcessState.READY);
+                                    result.process.setWorkProgress(result.workNeeded);
                                     result.process.setProgramCounter(result.nextPC);
                                     Ready_Queue.add(result.process);
                                 }
@@ -228,7 +234,7 @@ public class OS {
                             else{
                                 if (!Wait_Queue.isEmpty()) {
                                     ProcessImage processImage = Wait_Queue.remove(0);
-                                    io.execute(processImage, timeSlice);
+                                    io.execute(processImage, timeSlice_FCFS);
                                 }
                             }
                         }
