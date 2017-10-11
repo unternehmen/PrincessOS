@@ -29,7 +29,10 @@ public class StaticPriority implements Scheduler {
             heap.add(p);
         }
         
-        return new Pair<>(heap.remove(), -1);
+        ProcessImage poppedProcess = heap.remove();
+        readyQueue.remove(poppedProcess);
+        
+        return new Pair<>(poppedProcess, -1);
     }
     
     public boolean isEmpty(){

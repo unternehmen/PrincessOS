@@ -5,7 +5,7 @@ import common.Pair;
 import java.util.ArrayList;
 
 
-public class RoundRobin
+public class RoundRobin implements Scheduler
 {
     private int quantumLength;
     private ArrayList<ProcessImage> readyQueue;
