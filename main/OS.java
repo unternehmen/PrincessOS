@@ -243,7 +243,6 @@ public class OS {
                     for (ProcessImage p : New_Queue) {
                         p.setState(PCB.ProcessState.READY);
                         temp_Ready_Queue.add(p);
-                        process_Table.updateState(p.getPCB_ID(), PCB.ProcessState.READY);
                     }
                     RoundRobin roundRobin = new RoundRobin(temp_Ready_Queue, timeSlice);
 
@@ -338,7 +337,6 @@ public class OS {
                     for (ProcessImage p : New_Queue) {
                         p.setState(PCB.ProcessState.READY);
                         Ready_Queue.add(p);
-                        process_Table.updateState(p.getPCB_ID(), PCB.ProcessState.READY);
                     }
                     StaticPriority staticPriority = new StaticPriority(Ready_Queue);
 
